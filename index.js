@@ -45,7 +45,7 @@ module.exports = function ghostPortal(options) {
 function renderGhostPortal(req, res, config) {
   var locals = {
     strategies: [
-      {name: "Google", url: config.google.authURL}
+      {name: "Google OAuth", url: config.google.authURL}
     ]
   };
   res.end(jade.renderFile(__dirname + '/views/portal.jade', locals));
