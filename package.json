@@ -23,7 +23,7 @@
   "dependencies": {
     "jade": "^1.5.0",
     "passport": "^0.2.0",
-    "passport-google": "^0.3.0",
+    "passport-google-oauth": "^0.1.5",
     "underscore": "^1.6.0"
   }
 }

@@ -1,6 +1,6 @@
 var url = require('url'),
     passport = require('passport'),
-    GoogleStrategy = require('passport-google').Strategy,
+    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
     jade = require('jade'),
     _ = require('underscore');
 
@@ -51,13 +51,13 @@ function renderGhostPortal(req, res, config) {
 
 function configurePassport(req, res, config) {
   passport.use(new GoogleStrategy({
-      returnURL: 'http://' + req.headers.host + config.google.endpoint + '/return',
-      realm: 'http://' + req.headers.host + '/'
+      clientID: config.google.clientID,
+      clientSecret: config.google.clientSecret,
+      callbackURL: config.google.callbackURL
     },
-    function(identifier, profile, done) {
+    function(accessToken, refreshToken, profile, done) {
+      console.log(profile);
       process.nextTick(function() {
-        // var tiy = checkForTIY(profile);
-        // done(!tiy.length ? "not a TIY email" : null, profile.emails[0].value);
         var email = validEmailFromGoogleProfile(profile, config.google.requiredDomains);
         if (email) {
           done(null, email);
@@ -87,23 +87,21 @@ function validEmailFromGoogleProfile(profile, domains) {
 };
 
 function processOptions(options) {
-  var result = {};
+  if( ! options.google )
+    throw new Error("options must include a 'google' key");
 
-  var defaults = {
-    google: {
-      endpoint: '/auth/google',
-      requiredDomains: []
-    }
-  }
+  if( ! options.google.clientID )
+    throw new Error("options must include a 'google.clientID' key");
 
-  if (_.isObject(options)) {
-    _.extend(result, options);
-  }
+  if( ! options.google.clientSecret )
+    throw new Error("options must include a 'google.clientSecret' key");
 
-  _.each(defaults, function(config, strategy) {
-    result[strategy] = _.extend(config, result[strategy])
-  });
+  if( ! options.google.callbackURL)
+    throw new Error("options must include a 'google.callbackURL' key");
 
-  return result;
+  if( ! options.google.requiredDomains )
+    throw new Error("options must include a 'google.requiredDomains' key");
+
+  return options;
 }
 module.exports.processOptions = processOptions;
