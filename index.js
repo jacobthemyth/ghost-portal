@@ -14,13 +14,15 @@ module.exports = function ghostPortal(options) {
 
       passport.session()(req, res, function() {
 
-        var route = url.parse(req.url).pathname;
+        var currentRoute = url.parse(req.url).pathname;
+        var authRoute = url.parse(config.google.authURL).pathname;
+        var callbackRoute = url.parse(config.google.callbackURL).pathname;
 
-        switch (route) {
-          case config.google.endpoint :
+        switch (currentRoute) {
+          case authRoute :
             passport.authenticate('google')(req, res, next);
             break;
-          case config.google.endpoint + '/return' :
+          case callbackRoute :
             passport.authenticate('google')(req, res, function() {
               res.redirect('/');
             });
@@ -43,7 +45,7 @@ module.exports = function ghostPortal(options) {
 function renderGhostPortal(req, res, config) {
   var locals = {
     strategies: [
-      {name: "Google", url: config.google.endpoint}
+      {name: "Google", url: config.google.authURL}
     ]
   };
   res.end(jade.renderFile(__dirname + '/views/portal.jade', locals));
@@ -51,6 +53,7 @@ function renderGhostPortal(req, res, config) {
 
 function configurePassport(req, res, config) {
   passport.use(new GoogleStrategy({
+      scope: 'https://www.googleapis.com/auth/userinfo.email',
       clientID: config.google.clientID,
       clientSecret: config.google.clientSecret,
       callbackURL: config.google.callbackURL
@@ -96,6 +99,9 @@ function processOptions(options) {
   if( ! options.google.clientSecret )
     throw new Error("options must include a 'google.clientSecret' key");
 
+  if( ! options.google.authURL)
+    throw new Error("options must include a 'google.authURL' key");
+
   if( ! options.google.callbackURL)
     throw new Error("options must include a 'google.callbackURL' key");
 
@@ -104,4 +110,5 @@ function processOptions(options) {
 
   return options;
 }
+
 module.exports.processOptions = processOptions;
