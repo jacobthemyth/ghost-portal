@@ -1,6 +1,6 @@
 {
   "name": "ghost-portal",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Express middleware to guard your secrets",
   "main": "index.js",
   "scripts": {

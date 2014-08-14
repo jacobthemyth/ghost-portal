@@ -59,7 +59,6 @@ function configurePassport(req, res, config) {
       callbackURL: config.google.callbackURL
     },
     function(accessToken, refreshToken, profile, done) {
-      console.log(profile);
       process.nextTick(function() {
         var email = validEmailFromGoogleProfile(profile, config.google.requiredDomains);
         if (email) {
